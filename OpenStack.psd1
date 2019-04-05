@@ -16,10 +16,10 @@
     Author = 'Augustin Ziegler'
 
     # Company or vendor of this module
-    CompanyName = 'BearingPoint'
+    CompanyName = ''
 
     # Copyright statement for this module
-    Copyright = '(c) 2019 BearingPoint. All rights reserved.'
+    Copyright = ''
 
     # Description of the functionality provided by this module
     Description = 'PowerShell Module to manage OpenStack.'
