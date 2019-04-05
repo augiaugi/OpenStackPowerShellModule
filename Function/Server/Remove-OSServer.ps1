@@ -17,7 +17,7 @@
 
     .NOTES
 #>
-function Start-OSServer
+function Remove-OSServer
 {
     [CmdLetBinding(DefaultParameterSetName = 'Default')]
     Param
