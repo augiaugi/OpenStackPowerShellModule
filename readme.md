@@ -1,47 +1,36 @@
-Roadmap (TODOs)
+# OpenStack PowerShell module
 
-    -New-OSServer
-    -New-OSPort
-    -OSPortAllowedAddress (Get, Add, Remove)
-    -New-Volume
-    -New-VolumeSnapshot
-    -New-VolumeBackup
-    -set id as default property if exists (all have id property?? --> metadata???) on Get-OSObjectIdentifierer
-    -Identity
-        -all Set commands
-        -Region management
-        -Policy management
+This is a PowerShell module to manage OpenStack directly via OpenStack API.
 
-Command Guidlines
+For more information about the examples, roadmap, changelog, known issues, development guides, ... see the [wiki](https://github.com/augiaugi/OpenStackPowerShellModule/wiki). 
 
-    Alias
+## Installation
 
-        all Get Commands have alias (ID,Identity,<ObjectName, e.g. Flavor>)
+Download the zip file and extract it one of your desired PowerShell module paths  ([Installing a PowerShell Module](https://docs.microsoft.com/en-us/powershell/developer/module/installing-a-powershell-module)).
 
-    Parameter pass object
+    $Env:PSModulePath -split ';'
 
-        Get-OSFlavor -Identity (Get-OSFlavor -ID w1-16384)
+## Import the Module
 
-    Pipeline - describes basic pipline functionality
+    Import-Module OpenStack
+    Get-Command -Module OpenStack
 
-        Get-OSFlavor -ID "w1-16384", "w1-16384"
-        "w1-16384", "w1-16384" | Get-OSFlavor
+## Authenticate
 
-    Cross Object Pipline
-        Get-OSServer -ID ce847820-4d6b-47f0-b0e5-486457fe1044 | Get-OSFlavor
-        Get-OSServer | Select -First 1 | Get-OSFlavor
+    Connect-OSAccount -Credential (Get-Credential) -Project '<Project>' -AuthenticationUri 'http://<IP>:<Port>/v3/auth/tokens'
 
-    inteligent Pipline
+## Examples
 
-        allows not only one type of object beeing piped to a command
-        
-        e.g. not only pipe Get-OSGroup to Get-OSGroupMember
-        Get-OSUser -ImputObject 8de3aad02306495d8683d9fc94479b07 | Get-OSGroupMember
+get all server
 
-Known Issues
+    Get-OSServer
+    
+get server by ID
 
-    Pipline get Port from Server is not working because relation data "addresses" is custom object and has no id
-        Example: Get-OSServer -ID 7606ec9a-78d6-40ca-aee0-abf05c11edde | Get-OSPort
-        Workaround: Get-OSPort -Server (Get-OSServer -ID 7606ec9a-78d6-40ca-aee0-abf05c11edde)
+    Get-OSServer -ID ce847820-4d6b-47f0-b0e5-486457fe1044
 
-    Get-OSServer -ID 7606ec9a-78d6-40ca-aee0-abf05c11edde | Get-OSSecurityGroup
+search server by name (wildcard possible)
+
+    Get-OSServer -Name "<Name>"
+
+You can find more examples [here](https://github.com/augiaugi/OpenStackPowerShellModule/wiki/Examples).
