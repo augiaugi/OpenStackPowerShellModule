@@ -6,8 +6,9 @@ For more information about the examples, roadmap, changelog, known issues, devel
 
 ## Installation
 
-Download the zip file and extract it one of your desired PowerShell module paths  ([Installing a PowerShell Module](https://docs.microsoft.com/en-us/powershell/developer/module/installing-a-powershell-module)).
+Download the zip file and extract it to one of your desired PowerShell module paths ([Installing a PowerShell Module](https://docs.microsoft.com/en-us/powershell/developer/module/installing-a-powershell-module)).
 
+*see the available PowerShell module paths*
     $Env:PSModulePath -split ';'
 
 ## Import the Module
@@ -17,6 +18,7 @@ Download the zip file and extract it one of your desired PowerShell module paths
 
 ## Authenticate
 
+*Connect to the OpenStack API and get authentication token, this is required before using any command in this module.*
     Connect-OSAccount -Credential (Get-Credential) -Project '<Project>' -AuthenticationUri 'http://<IP>:<Port>/v3/auth/tokens'
 
 ## Examples

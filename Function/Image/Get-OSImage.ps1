@@ -5,8 +5,6 @@
 
     .PARAMETER ImputObject
 
-    .PARAMETER Name
-
     .INPUTS
 
     .OUTPUTS
