@@ -37,7 +37,7 @@ function Mount-OSVolume
         [ValidateNotNullOrEmpty()]
         $Server,
 
-        [Parameter (ParameterSetName = 'Default', Mandatory = $false)]
+        [Parameter (ParameterSetName = 'Default', Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [string]$Mountpoint
     )
@@ -58,8 +58,8 @@ function Mount-OSVolume
 
                 $Properties = @{
                     instance_uuid=$Server
+                    mountpoint=$Mountpoint
                 }
-                if($Mountpoint){$Properties.Add('mountpoint', $Mountpoint)}
                 $Body = [PSCustomObject]@{'os-attach'=$Properties}
 
                 Invoke-OSApiRequest -HTTPVerb Post -Type volumev3 -Uri "volumes/$ImputObject/action" -Body $Body -NoOutput
