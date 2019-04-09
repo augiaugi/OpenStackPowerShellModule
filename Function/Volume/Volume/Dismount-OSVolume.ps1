@@ -53,7 +53,7 @@ function Dismount-OSVolume
                 }
                 $Body = [PSCustomObject]@{'os-detach'=$Properties}
 
-                Invoke-OSApiRequest -HTTPVerb Post -Type volumev3 -Uri "volumes/$ImputObject/action" -NoOutput
+                Invoke-OSApiRequest -HTTPVerb Post -Type volumev3 -Uri "volumes/$ImputObject/action" -Body $Body -NoOutput
             }
         }
         catch
