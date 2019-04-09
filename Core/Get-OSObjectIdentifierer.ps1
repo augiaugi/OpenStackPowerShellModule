@@ -67,6 +67,14 @@
         #region Region
         [PSCustomObject]@{Type='OS.Region'; PropertyHint=$null; PropertyPath='id'; Default=$true}
         #endregion
+
+        #region Service
+        [PSCustomObject]@{Type='OS.Service'; PropertyHint=$null; PropertyPath='id'; Default=$true}
+        #endregion
+
+        #region Endpoint
+        [PSCustomObject]@{Type='OS.Endpoint'; PropertyHint=$null; PropertyPath='id'; Default=$true}
+        #endregion
       )
 
       $Type = $Object.pstypenames[0]
