@@ -33,7 +33,11 @@ function Get-OSGroup
 
         [Parameter (ParameterSetName = 'Name', Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        $Name
+        $Name,
+
+        [Parameter (ParameterSetName = 'User', Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        $User
     )
 
     process
@@ -65,6 +69,16 @@ function Get-OSGroup
                     {
                         Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get Group [$Name]"
                         Write-Output (Get-OSGroup | ?{$_.name -like $Name})
+                    }
+                }
+                'User'
+                {
+                    foreach($User in $User)
+                    {
+                        $User = Get-OSObjectIdentifierer -Object $User -PropertyHint 'OS.User'
+
+                        Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get GroupMembers from User [$User]"
+                        Write-Output (Invoke-OSApiRequest -Type identity -Uri "users/$User/groups" -Property 'groups' -ObjectType 'OS.Group')
                     }
                 }
                 default

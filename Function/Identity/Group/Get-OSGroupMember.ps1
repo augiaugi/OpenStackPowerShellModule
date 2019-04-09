@@ -25,11 +25,7 @@ function Get-OSGroupMember
         [Parameter (ParameterSetName = 'Default', Mandatory = $true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [Alias('ID', 'Identity', 'Group')]
-        $ImputObject,
-
-        [Parameter (ParameterSetName = 'User', Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        $User
+        $ImputObject
     )
 
     process
@@ -56,16 +52,6 @@ function Get-OSGroupMember
                             Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get GroupMembers [$ImputObject]"
                             Write-Output (Invoke-OSApiRequest -Type identity -Uri "groups/$ImputObject/users" -Property 'users' -ObjectType 'OS.User')
                         }
-                    }
-                }
-                'User'
-                {
-                    foreach($User in $User)
-                    {
-                        $User = Get-OSObjectIdentifierer -Object $User -PropertyHint 'OS.User'
-
-                        Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get GroupMembers from User [$User]"
-                        Write-Output (Invoke-OSApiRequest -Type identity -Uri "users/$User/groups" -Property 'groups' -ObjectType 'OS.Group')
                     }
                 }
                 default

@@ -33,7 +33,11 @@ function Get-OSProject
 
         [Parameter (ParameterSetName = 'Name', Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        $Name
+        $Name,
+
+        [Parameter (ParameterSetName = 'User', Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        $User
     )
 
     process
@@ -65,6 +69,16 @@ function Get-OSProject
                     {
                         Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get Project [$Name]"
                         Write-Output (Get-OSProject | ?{$_.name -like $Name})
+                    }
+                }
+                'User'
+                {
+                    foreach($User in $User)
+                    {
+                        $User = Get-OSObjectIdentifierer -Object $User -PropertyHint 'OS.User'
+
+                        Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get Projects from User [$User]"
+                        Write-Output (Invoke-OSApiRequest -Type identity -Uri "users/$User/projects" -Property 'projects' -ObjectType 'OS.Project')
                     }
                 }
                 default
