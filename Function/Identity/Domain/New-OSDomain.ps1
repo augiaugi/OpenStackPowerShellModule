@@ -25,7 +25,7 @@
 
     .LINK
 
-        https://developer.openstack.org/api-ref/identity/v3/?delete-group&expanded=create-user-detail#create-domain
+        https://developer.openstack.org/api-ref/identity/v3/#create-domain
 
     .NOTES
 #>
@@ -58,7 +58,7 @@ function New-OSDomain
             $Properties = @{
                 name=$Name
             }
-            if($Enabled){$Properties.Add('enabled ', $Enabled)}
+            if($Enabled){$Properties.Add('enabled', $Enabled)}
             if($Description){$Properties.Add('description', $Description)}
             $Body = [PSCustomObject]@{domain=$Properties}
 

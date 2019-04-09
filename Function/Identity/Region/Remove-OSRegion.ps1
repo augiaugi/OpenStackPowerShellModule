@@ -13,18 +13,18 @@
 
     .LINK
 
-        https://developer.openstack.org/api-ref/identity/v3/#delete-domain
+        https://developer.openstack.org/api-ref/identity/v3/#delete-regions
 
     .NOTES
 #>
-function Remove-OSDomain
+function Remove-OSRegion
 {
     [CmdLetBinding(DefaultParameterSetName = 'Default')]
     Param
     (
         [Parameter (ParameterSetName = 'Default', Mandatory = $true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
-        [Alias('ID', 'Identity', 'Domain')]
+        [Alias('ID', 'Identity', 'Region')]
         $ImputObject
     )
 
@@ -36,11 +36,11 @@ function Remove-OSDomain
 
             foreach($ImputObject in $ImputObject)
             {
-                $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Domain'
+                $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Region'
 
-                Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "remove Domain [$ImputObject]"
+                Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "remove Region [$ImputObject]"
                 
-                Invoke-OSApiRequest -HTTPVerb Delete -Type identity -Uri "domains/$ImputObject" -NoOutput
+                Invoke-OSApiRequest -HTTPVerb Delete -Type identity -Uri "regions/$ImputObject" -NoOutput
             }
         }
         catch
