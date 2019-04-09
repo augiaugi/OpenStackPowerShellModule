@@ -21,6 +21,8 @@
 
     .EXAMPLE
 
+    New-OSVolume -Size 1 -Name 'OS_disk'
+
     .LINK
 
         https://developer.openstack.org/api-ref/block-storage/v3/#create-a-volume
