@@ -60,14 +60,22 @@
     {
       $BodyJson = ($Body | ConvertTo-Json -Compress)
       Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "use request body [$BodyJson]"
-      $Data = @(Invoke-RestMethod -Method $HTTPVerb -Uri $FullUri -Body $BodyJson -Headers $APIRequestHeader -Verbose:$false)
+      $Response = @(Invoke-WebRequest -Method $HTTPVerb -Uri $FullUri -Body $BodyJson -Headers $APIRequestHeader -Verbose:$false)
     }
     else 
     {
       Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "no request body defined"
-      $Data = @(Invoke-RestMethod -Method $HTTPVerb -Uri $FullUri -Headers $APIRequestHeader -Verbose:$false)
+      $Response = @(Invoke-WebRequest -Method $HTTPVerb -Uri $FullUri -Headers $APIRequestHeader -Verbose:$false)
     }
     Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "invoked API request"
+
+    #output header for debugging purposes 
+    foreach($Header in $Response.Headers.GetEnumerator())
+    {
+      Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "Header [$($Header.Key)]=[$($Header.Value)]"
+    }
+
+    $Data = $Response.Content | ConvertFrom-Json
 
     Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "Raw Data [$($Data | ConvertTo-Json -Depth 10)]"
 
