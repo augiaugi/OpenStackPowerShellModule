@@ -67,7 +67,7 @@
       Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "no request body defined"
       $Response = @(Invoke-WebRequest -Method $HTTPVerb -Uri $FullUri -Headers $APIRequestHeader -Verbose:$false)
     }
-    Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "invoked API request"
+    Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "invoked API request, StatusCode [$($Response.StatusCode)], StatusDescription [$($Response.StatusDescription)]"
 
     #output header for debugging purposes 
     foreach($Header in $Response.Headers.GetEnumerator())
