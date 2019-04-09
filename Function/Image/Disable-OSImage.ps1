@@ -17,7 +17,7 @@
 
     .NOTES
 #>
-function Enable-OSImage
+function Disable-OSImage
 {
     [CmdLetBinding(DefaultParameterSetName = 'Default')]
     Param
