@@ -41,7 +41,7 @@ function Start-OSServer
 
                 Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "start Server [$ID]"
                 
-                Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers/$ID" -NoOutput -Body ([PSCustomObject]@{'os-start'=$null})
+                Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers/$ID/action" -NoOutput -Body ([PSCustomObject]@{'os-start'=$null})
             }
         }
         catch

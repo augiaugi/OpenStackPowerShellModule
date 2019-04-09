@@ -47,7 +47,7 @@ function Restart-OSServer
 
                 Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "start Server [$ID], Type [$Type]"
                 
-                Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers/$ID" -NoOutput -Body ([PSCustomObject]@{reboot=[PSCustomObject]@{type=$Type}})
+                Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers/$ID/action" -NoOutput -Body ([PSCustomObject]@{reboot=[PSCustomObject]@{type=$Type}})
             }
         }
         catch

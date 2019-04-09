@@ -41,7 +41,7 @@ function Stop-OSServer
 
                 Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "stop Server [$ID]"
                 
-                Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers/$ID" -NoOutput -Body ([PSCustomObject]@{'os-stop'=$null})
+                Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers/$ID/action" -NoOutput -Body ([PSCustomObject]@{'os-stop'=$null})
             }
         }
         catch
