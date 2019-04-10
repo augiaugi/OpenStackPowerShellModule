@@ -45,7 +45,7 @@ function Remove-OSServerVolumeAttachment
 
                 foreach($Volume in $Volume)
                 {
-                    $Volume = Get-OSObjectIdentifierer -Object $Port -PropertyHint 'OS.Volume'
+                    $Volume = Get-OSObjectIdentifierer -Object $Volume -PropertyHint 'OS.Volume'
 
                     Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "remove Server [$Server] Volume [$Volume]"
                     Invoke-OSApiRequest -HTTPVerb Delete -Type compute -Uri "servers/$Server/os-volume_attachments/$Volume" -NoOutput
