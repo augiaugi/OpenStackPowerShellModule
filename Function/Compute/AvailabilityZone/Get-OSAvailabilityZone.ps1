@@ -7,8 +7,6 @@
 
     An availability zone is created or updated by setting the availability_zone parameter in the create, update, or create or update methods of the Host Aggregates API. See Host Aggregates for more details.
 
-    .PARAMETER Image
-
     .PARAMETER ZoneName
 
     search by ZoneName
@@ -27,14 +25,9 @@
 #>
 function Get-OSAvailabilityZone
 {
-    [CmdLetBinding(DefaultParameterSetName = 'All')]
+    [CmdLetBinding(DefaultParameterSetName = 'Default')]
     Param
     (
-        [Parameter (ParameterSetName = 'ImputObject', Mandatory = $true, ValueFromPipeline=$true)]
-        [ValidateNotNullOrEmpty()]
-        [Alias('ID', 'Identity', 'AvailabilityZone')]
-        $ImputObject,
-
         [Parameter (ParameterSetName = 'ZoneName', Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         $ZoneName
@@ -48,20 +41,10 @@ function Get-OSAvailabilityZone
 
             switch ($PsCmdlet.ParameterSetName)
             {
-                'All'
+                'Default'
                 {
                     Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get all AvailabilityZone"
-                    Write-Output (Invoke-OSApiRequest -Type compute -Uri "/os-availability-zone" -Property 'availabilityZoneInfo' -ObjectType 'OS.AvailabilityZone')
-                }
-                'ImputObject'
-                {
-                    foreach($ImputObject in $ImputObject)
-                    {
-                        $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.AvailabilityZone'
-
-                        Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get AvailabilityZone [$ImputObject]"
-                        Write-Output (Invoke-OSApiRequest -Type compute -Uri "/os-availability-zone/$ImputObject" -Property 'availabilityZoneInfo' -ObjectType 'OS.AvailabilityZone')
-                    }
+                    Write-Output (Invoke-OSApiRequest -Type compute -Uri "/os-availability-zone/detail" -Property 'availabilityZoneInfo' -ObjectType 'OS.AvailabilityZone')
                 }
                 'ZoneName'
                 {
