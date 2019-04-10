@@ -3,11 +3,15 @@
 
     .DESCRIPTION
 
-    .PARAMETER Image
+    .PARAMETER ImputObject
 
     .PARAMETER Name
 
     search SecurityGroup by name
+
+    .PARAMETER Server
+
+    Lists security groups for a server.
 
     .INPUTS
 
@@ -33,7 +37,11 @@ function Get-OSSecurityGroup
 
         [Parameter (ParameterSetName = 'Name', Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        $Name
+        $Name,
+
+        [Parameter (ParameterSetName = 'Server', Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        $Server
     )
 
     process
@@ -53,11 +61,15 @@ function Get-OSSecurityGroup
                 {
                     foreach($ImputObject in $ImputObject)
                     {
-                        $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.SecurityGroup'
-
-                        #if multiple objects gets returned
-                        foreach($ImputObject in $ImputObject)
+                        #inteligent pipline
+                        if($ImputObject.pstypenames[0] -eq 'OS.Server')
                         {
+                            Get-OSSecurityGroup -Server $ImputObject
+                        }
+                        else 
+                        {
+                            $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.SecurityGroup'
+
                             Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get SecurityGroup [$ImputObject]"
                             Write-Output (Invoke-OSApiRequest -Type network -Uri "/v2.0/security-groups/$ImputObject" -Property 'security_group' -ObjectType 'OS.SecurityGroup')
                         }
@@ -69,6 +81,16 @@ function Get-OSSecurityGroup
                     {
                         Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get SecurityGroup [$Name]"
                         Write-Output (Get-OSSecurityGroup | ?{$_.name -like $Name})
+                    }
+                }
+                'Server'
+                {
+                    foreach($Server in $Server)
+                    {
+                        $Server = Get-OSObjectIdentifierer -Object $Server -PropertyHint 'OS.Server'
+
+                        Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get SecurityGroups for Server [$Server]"
+                        Write-Output (Invoke-OSApiRequest -Type compute -Uri "servers/$Server/os-security-groups" -Property 'security_groups' -ObjectType 'OS.SecurityGroup')
                     }
                 }
                 default

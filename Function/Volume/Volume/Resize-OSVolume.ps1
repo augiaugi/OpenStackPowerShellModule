@@ -17,7 +17,7 @@
 
     .LINK
 
-        https://developer.openstack.org/api-ref/block-storage/v3/?expanded=get-volumes-summary-detail#extend-a-volume-size
+        https://developer.openstack.org/api-ref/block-storage/v3/#extend-a-volume-size
 
     .NOTES
 #>

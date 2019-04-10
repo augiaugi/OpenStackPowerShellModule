@@ -90,7 +90,7 @@
       if($Property)
       {
         Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "output data with Property [$Property]"
-        $Data = @($Data.$Property)
+        $Data = @(Invoke-Expression "`$Data.$Property")
       }
 
       foreach($DataItem in $Data)

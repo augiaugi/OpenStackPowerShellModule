@@ -53,11 +53,15 @@ function Get-OSFlavor
                 {
                     foreach($ImputObject in $ImputObject)
                     {
-                        $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Flavor'
-
-                        #if multiple objects gets returned
-                        foreach($ImputObject in $ImputObject)
+                        #inteligent pipline
+                        if($ImputObject.pstypenames[0] -eq 'OS.Server')
                         {
+                            Get-OSFlavor -ID $ImputObject.flavor.id
+                        }
+                        else 
+                        {
+                            $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Flavor'
+
                             Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get Flavor [$ImputObject]"
                             Write-Output (Invoke-OSApiRequest -Type compute -Uri "/flavors/$ImputObject" -Property 'flavor' -ObjectType 'OS.Flavor')
                         }

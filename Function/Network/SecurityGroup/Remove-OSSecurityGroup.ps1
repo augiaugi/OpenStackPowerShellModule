@@ -4,7 +4,7 @@
     .DESCRIPTION
 
     .PARAMETER ImputObject
-    
+
     .INPUTS
 
     .OUTPUTS
@@ -13,18 +13,18 @@
 
     .LINK
 
-        https://developer.openstack.org/api-ref/network/v2/?expanded=#delete-port
+        https://developer.openstack.org/api-ref/network/v2/#delete-security-group
 
     .NOTES
 #>
-function Remove-OSPort
+function Remove-OSSecurityGroup
 {
     [CmdLetBinding(DefaultParameterSetName = 'Default')]
     Param
     (
         [Parameter (ParameterSetName = 'Default', Mandatory = $true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
-        [Alias('ID', 'Identity', 'Port')]
+        [Alias('ID', 'Identity', 'SecurityGroup')]
         $ImputObject
     )
 
@@ -36,11 +36,11 @@ function Remove-OSPort
 
             foreach($ImputObject in $ImputObject)
             {
-                $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Port'
+                $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.SecurityGroup'
 
-                Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "remove Port [$ImputObject]"
+                Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "remove SecurityGroup [$ImputObject]"
                 
-                Invoke-OSApiRequest -HTTPVerb Delete -Type network -Uri "/v2.0/ports/$ImputObject" -NoOutput
+                Invoke-OSApiRequest -HTTPVerb Delete -Type network -Uri "/v2.0/security-groups/$ImputObject" -NoOutput
             }
         }
         catch

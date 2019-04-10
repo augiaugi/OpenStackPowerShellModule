@@ -4,7 +4,7 @@
     .DESCRIPTION
 
     .PARAMETER ImputObject
-    
+
     .INPUTS
 
     .OUTPUTS
@@ -13,18 +13,18 @@
 
     .LINK
 
-        https://developer.openstack.org/api-ref/network/v2/?expanded=#delete-port
+    https://developer.openstack.org/api-ref/compute/#show-server-diagnostics
 
     .NOTES
 #>
-function Remove-OSPort
+function Get-OSServerDiagnostic
 {
     [CmdLetBinding(DefaultParameterSetName = 'Default')]
     Param
     (
         [Parameter (ParameterSetName = 'Default', Mandatory = $true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
-        [Alias('ID', 'Identity', 'Port')]
+        [Alias('ID', 'Identity', 'Server')]
         $ImputObject
     )
 
@@ -32,16 +32,12 @@ function Remove-OSPort
     {
         try
         {
-            Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "start"
+            Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "start, ParameterSetName [$($PsCmdlet.ParameterSetName)]"
 
-            foreach($ImputObject in $ImputObject)
-            {
-                $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Port'
+            $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Server'
 
-                Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "remove Port [$ImputObject]"
-                
-                Invoke-OSApiRequest -HTTPVerb Delete -Type network -Uri "/v2.0/ports/$ImputObject" -NoOutput
-            }
+            Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get Server [$ImputObject] Diagnostic"
+            Write-Output (Invoke-OSApiRequest -Type compute -Uri "servers/$ImputObject/diagnostics" -ObjectType 'OS.ServerDiagnostic')
         }
         catch
         {
