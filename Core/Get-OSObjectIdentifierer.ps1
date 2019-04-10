@@ -20,7 +20,13 @@
     if($Object)
     {
       $IdentityRelationConfig = @(
+        #region Server
         [PSCustomObject]@{Type='OS.Server'; PropertyHint=$null; PropertyPath='id'; Default=$true}
+        #endregion
+
+        #region ServerAction
+        [PSCustomObject]@{Type='OS.ServerAction'; PropertyHint=$null; PropertyPath='request_id'; Default=$true}
+        #endregion
 
         #region Image
         [PSCustomObject]@{Type='OS.Image'; PropertyHint=$null; PropertyPath='id'; Default=$true}
