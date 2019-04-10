@@ -75,6 +75,10 @@
         #region Endpoint
         [PSCustomObject]@{Type='OS.Endpoint'; PropertyHint=$null; PropertyPath='id'; Default=$true}
         #endregion
+
+        #region Hypervisor
+        [PSCustomObject]@{Type='OS.Hypervisor'; PropertyHint=$null; PropertyPath='id'; Default=$true}
+        #endregion
       )
 
       $Type = $Object.pstypenames[0]
