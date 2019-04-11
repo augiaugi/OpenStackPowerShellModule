@@ -9,10 +9,6 @@
 
     .PARAMETER Description
 
-    .PARAMETER AllowedAddressPair
-
-    A set of zero or more allowed address pair objects each where address pair object contains an ip_address and mac_address. While the ip_address is required, the mac_address will be taken from the port if not specified. The value of ip_address can be an IP Address or a CIDR (if supported by the underlying extension plugin). A server connected to the port can send a packet with source address which matches one of the specified allowed address pairs.
-
     .INPUTS
 
     .OUTPUTS
@@ -39,10 +35,7 @@ function Set-OSPort
         [string]$Name,
 
         [Parameter (ParameterSetName = 'Default', Mandatory = $false)]
-        [string]$Description,
-
-        [Parameter (ParameterSetName = 'Default', Mandatory = $false)]
-        [string[]]$AllowedAddressPair
+        [string]$Description
     )
 
     process
@@ -58,7 +51,6 @@ function Set-OSPort
                 $BodyProperties = @{}
                 if($PSBoundParameters.ContainsKey('Name')){$BodyProperties.Add('name', $Name)}
                 if($PSBoundParameters.ContainsKey('Description')){$BodyProperties.Add('description', $Description)}
-                if($PSBoundParameters.ContainsKey('AllowedAddressPair')){$BodyProperties.Add('allowed_address_pairs', @($AllowedAddressPair))}
                 $BodyObject = [PSCustomObject]@{port=$BodyProperties}
 
                 Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "set Port [$ImputObject]"
