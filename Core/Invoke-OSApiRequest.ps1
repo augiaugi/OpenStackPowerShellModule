@@ -58,7 +58,7 @@
     Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type DEBUG -Message "invoke API request [$FullUri], HTTPVerb [$HTTPVerb]"
     if($Body -and ($Body | ConvertTo-Json -Compress) -ne '{}') 
     {
-      $BodyJson = ($Body | ConvertTo-Json -Compress)
+      $BodyJson = ($Body | ConvertTo-Json -Compress -Depth 99)
       Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "use request body [$BodyJson]"
       $Response = @(Invoke-WebRequest -Method $HTTPVerb -Uri $FullUri -Body $BodyJson -Headers $APIRequestHeader -Verbose:$false)
     }
