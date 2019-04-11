@@ -81,9 +81,7 @@ function New-OSFlavor
             if($Description){$BodyProperties.Add('description', $Description)}
             $Body.flavor = $BodyProperties
 
-            $Flavor = Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "flavors" -Property 'flavor' -ObjectType 'OS.CreateFlavor' -Body $Body
-
-            Get-OSFlavor -ID $Flavor.id
+            Write-Output (Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "flavors" -Property 'flavor' -ObjectType 'OS.CreateFlavor' -Body $Body)
         }
         catch
         {

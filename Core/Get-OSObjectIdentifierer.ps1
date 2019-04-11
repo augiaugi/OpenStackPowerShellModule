@@ -39,6 +39,14 @@
         [PSCustomObject]@{Type='OS.ServerVolumeAttachment'; PropertyHint='OS.Volume'; PropertyPath='volumeId'; Default=$false} #get Volume from ServerVolumeAttachment object
         #endregion
 
+        #region VolumeSnapshot
+        [PSCustomObject]@{Type='OS.VolumeSnapshot'; PropertyHint=$null; PropertyPath='id'; Default=$true}
+        #endregion
+
+        #region VolumeBackup
+        [PSCustomObject]@{Type='OS.VolumeBackup'; PropertyHint=$null; PropertyPath='id'; Default=$true}
+        #endregion
+
         #region Port
         [PSCustomObject]@{Type='OS.Port'; PropertyHint=$null; PropertyPath='id'; Default=$true}
         [PSCustomObject]@{Type='OS.ServerInterface'; PropertyHint='OS.Port'; PropertyPath='port_id'; Default=$false} #get Port from ServerInterface object
