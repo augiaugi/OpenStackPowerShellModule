@@ -24,13 +24,13 @@ function Remove-OSServerVolumeAttachment
     [CmdLetBinding(DefaultParameterSetName = 'Default')]
     Param
     (
+        [Parameter (ParameterSetName = 'Default', Mandatory = $true)]
+        [Alias('ID', 'Identity', 'Volume')]
+        $ImputObject,
+
         [Parameter (ParameterSetName = 'Default', Mandatory = $true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
-        $Server,
-
-        [Parameter (ParameterSetName = 'Default', Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        $Volume
+        $Server
     )
 
     process
@@ -39,17 +39,14 @@ function Remove-OSServerVolumeAttachment
         {
             Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "start"
 
-            foreach($Server in $Server)
+            $Server = Get-OSObjectIdentifierer -Object $Server -PropertyHint 'OS.Server'
+
+            foreach($ImputObject in $ImputObject)
             {
-                $Server = Get-OSObjectIdentifierer -Object $Server -PropertyHint 'OS.Server'
+                $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Volume'
 
-                foreach($Volume in $Volume)
-                {
-                    $Volume = Get-OSObjectIdentifierer -Object $Volume -PropertyHint 'OS.Volume'
-
-                    Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "remove Server [$Server] Volume [$Volume]"
-                    Invoke-OSApiRequest -HTTPVerb Delete -Type compute -Uri "servers/$Server/os-volume_attachments/$Volume" -NoOutput
-                }
+                Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "remove Server [$Server] Volume [$ImputObject]"
+                Invoke-OSApiRequest -HTTPVerb Delete -Type compute -Uri "servers/$Server/os-volume_attachments/$ImputObject" -NoOutput
             }
         }
         catch

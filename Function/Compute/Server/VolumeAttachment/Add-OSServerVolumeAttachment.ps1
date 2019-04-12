@@ -3,6 +3,8 @@
 
     .DESCRIPTION
 
+    .PARAMETER ImputObject
+
     .PARAMETER Server
 
     .PARAMETER Device
@@ -28,7 +30,8 @@ function Add-OSServerVolumeAttachment
     (
         [Parameter (ParameterSetName = 'Default', Mandatory = $true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
-        $Volume,
+        [Alias('ID', 'Identity', 'Volume')]
+        $ImputObject,
 
         [Parameter (ParameterSetName = 'Default', Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -45,26 +48,23 @@ function Add-OSServerVolumeAttachment
         {
             Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "start, ParameterSetName [$($PsCmdlet.ParameterSetName)]"
 
-            foreach($Server in $Server)
+            $Server = Get-OSObjectIdentifierer -Object $Server -PropertyHint 'OS.Server'
+
+            foreach($ImputObject in $ImputObject)
             {
-                $Server = Get-OSObjectIdentifierer -Object $Server -PropertyHint 'OS.Server'
+                $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Volume'
 
-                foreach($Volume in $Volume)
+                Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "add VolumeAttachment [$ImputObject] to Server [$Server]"
+
+                if($Device)
                 {
-                    $Volume = Get-OSObjectIdentifierer -Object $Volume -PropertyHint 'OS.Volume'
-
-                    Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "add VolumeAttachment [$Port] to Server [$Server]"
-
-                    if($Device)
-                    {
-                        $Body = ([PSCustomObject]@{volumeAttachment=[PSCustomObject]@{volumeId=$Volume; device=$Device}})
-                    }
-                    else 
-                    {
-                        $Body = ([PSCustomObject]@{volumeAttachment=[PSCustomObject]@{volumeId=$Volume}})
-                    }
-                    Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers/$Server/os-volume_attachments" -Property 'volumeAttachment' -ObjectType 'OS.ServerVolumeAttachment' -Body $Body
+                    $Body = ([PSCustomObject]@{volumeAttachment=[PSCustomObject]@{volumeId=$ImputObject; device=$Device}})
                 }
+                else 
+                {
+                    $Body = ([PSCustomObject]@{volumeAttachment=[PSCustomObject]@{volumeId=$ImputObject}})
+                }
+                Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers/$Server/os-volume_attachments" -Property 'volumeAttachment' -ObjectType 'OS.ServerVolumeAttachment' -Body $Body
             }
         }
         catch
