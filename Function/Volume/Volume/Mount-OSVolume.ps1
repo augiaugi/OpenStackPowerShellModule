@@ -61,7 +61,6 @@ function Mount-OSVolume
                     mountpoint=$Mountpoint
                 }
                 $Body = [PSCustomObject]@{'os-attach'=$Properties}
-
                 Invoke-OSApiRequest -HTTPVerb Post -Type volumev3 -Uri "volumes/$ImputObject/action" -Body $Body -NoOutput
             }
         }

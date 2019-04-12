@@ -9,6 +9,8 @@
 
     .PARAMETER IpAddress
 
+    .PARAMETER All
+
     .INPUTS
 
     .OUTPUTS
@@ -23,43 +25,73 @@
 #>
 function Remove-OSPortAllowedAddressPair
 {
-    [CmdLetBinding(DefaultParameterSetName = 'Default')]
+    [CmdLetBinding(DefaultParameterSetName = 'IpAddress')]
     Param
     (
-        [Parameter (ParameterSetName = 'Default', Mandatory = $true, ValueFromPipeline=$true)]
+        [Parameter (ParameterSetName = 'IpAddress', Mandatory = $true, ValueFromPipeline=$true)]
+        [Parameter (ParameterSetName = 'All', Mandatory = $true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
         [Alias('ID', 'Identity', 'Port')]
         $ImputObject,
     
-        [Parameter (ParameterSetName = 'Default', Mandatory = $true)]
+        [Parameter (ParameterSetName = 'IpAddress', Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [string]$IpAddress
+        [string]$IpAddress,
+    
+        [Parameter (ParameterSetName = 'All', Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [switch]$All
     )
 
     process
     {
         try
         {
-            Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "start"
+            Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "start, ParameterSetName [$($PsCmdlet.ParameterSetName)]"
 
-            foreach($ImputObject in $ImputObject)
+            switch ($PsCmdlet.ParameterSetName)
             {
-                $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Port'
-
-                $Port = $ImputObject | Get-OSPort
-
-                if($Port.allowed_address_pairs.ip_address -notcontains $IpAddress)
+                'ImputObject'
                 {
-                    throw "AllowedAddressPair does not contains IpAddress [$IpAddress]."
+                    foreach($ImputObject in $ImputObject)
+                    {
+                        $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Port'
+
+                        $Port = $ImputObject | Get-OSPort
+
+                        if($Port.allowed_address_pairs.ip_address -notcontains $IpAddress)
+                        {
+                            throw "AllowedAddressPair does not contains IpAddress [$IpAddress]."
+                        }
+
+                        $AllowedAddressPair = @($Port.allowed_address_pairs | ?{$_.ip_address -ne $IpAddress})
+                        $BodyObject = [PSCustomObject]@{port=[PSCustomObject]@{allowed_address_pairs=$AllowedAddressPair}}
+
+                        Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "add AllowedAddressPair [$IpAddress] to Port [$ImputObject], MacAddress [$MacAddress]"
+                        
+                        Write-Output (Invoke-OSApiRequest -HTTPVerb Put -Type network -Uri "/v2.0/ports/$ImputObject" -Property 'port' -ObjectType 'OS.Port' -Body $BodyObject)
+                    }
                 }
-
-                $AllowedAddressPair = @($Port.allowed_address_pairs | ?{$_.ip_address -ne $IpAddress})
-                $BodyObject = [PSCustomObject]@{port=[PSCustomObject]@{allowed_address_pairs=$AllowedAddressPair}}
-
-                Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "add AllowedAddressPair [$IpAddress] to Port [$ImputObject], MacAddress [$MacAddress]"
-                
-                Write-Output (Invoke-OSApiRequest -HTTPVerb Put -Type network -Uri "/v2.0/ports/$ImputObject" -Property 'port' -ObjectType 'OS.Port' -Body $BodyObject)
+                'All'
+                {
+                    foreach($ImputObject in $ImputObject)
+                    {
+                        $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Port'
+        
+                        $BodyObject = [PSCustomObject]@{port=[PSCustomObject]@{allowed_address_pairs=@()}}
+        
+                        Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "add AllowedAddressPair [$IpAddress] to Port [$ImputObject], MacAddress [$MacAddress]"
+                        
+                        Write-Output (Invoke-OSApiRequest -HTTPVerb Put -Type network -Uri "/v2.0/ports/$ImputObject" -Property 'port' -ObjectType 'OS.Port' -Body $BodyObject)
+                    }
+                }
+                default
+                {
+                    throw "unexpected ParameterSetName [$ParameterSetName]"
+                }
             }
+
+            
         }
         catch
         {
