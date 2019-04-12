@@ -11,7 +11,23 @@
 
     .OUTPUTS
 
-    .EXAMPLE
+    .EXAMPLE 
+    
+    Get-OSServer
+
+    get all server
+
+    .EXAMPLE 
+    
+    Get-OSServer -ID '5017ed96-5940-4604-a6b6-76c56fb5b952'
+
+    get server by id
+    
+    .EXAMPLE 
+    
+    Get-OSServer -Name 'Server*'
+
+    search server by name (wildcard allowed)
 
     .LINK
 

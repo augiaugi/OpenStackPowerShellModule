@@ -11,6 +11,10 @@
 
     .EXAMPLE
 
+    New-OSServer -Name Win2016 -Flavor (Get-OSFlavor -Name 'm1.small') -Image (Get-OSImage -Name 'Win2016')
+
+    create a new server by Image
+
     .LINK
 
         https://developer.openstack.org/api-ref/compute/#create-server
