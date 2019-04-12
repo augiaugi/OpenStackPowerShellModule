@@ -19,36 +19,74 @@
 #>
 function New-OSServer
 {
-    [CmdLetBinding(DefaultParameterSetName = 'Default')]
+    [CmdLetBinding(DefaultParameterSetName = 'Image')]
     Param
     (
-        [Parameter (ParameterSetName = 'Default', Mandatory = $true)]
+        [Parameter (ParameterSetName = 'Image', Mandatory = $true)]
+        [Parameter (ParameterSetName = 'Volume', Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        $Name,
+        [string]$Name,
 
-        [Parameter (ParameterSetName = 'Default', Mandatory = $true)]
+        [Parameter (ParameterSetName = 'Image', Mandatory = $true)]
+        [Parameter (ParameterSetName = 'Volume', Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        $Flavor
+        $Flavor,
+
+        [Parameter (ParameterSetName = 'Image', Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        $Image,
+
+        [Parameter (ParameterSetName = 'Volume', Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        $Volume
     )
 
     process
     {
         try
         {
-            Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "start"
+            Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "start, ParameterSetName [$($PsCmdlet.ParameterSetName)]"
 
             $Flavor = Get-OSObjectIdentifierer -Object $Flavor -PropertyHint 'OS.Flavor'
-
-            Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "create Server [$Name], Flavor [$Flavor]"
-                
-            $Body = [PSCustomObject]@{server=[PSCustomObject]@{
+            $BodyProperties = @{
                 name=$Name
                 flavorRef=$Flavor
-            }}
+            }
 
-            $Server = Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers" -Property 'server' -ObjectType 'OS.CreateServer' -Body $Body
+            switch ($PsCmdlet.ParameterSetName)
+            {
+                'Image'
+                {
+                    $Image = Get-OSObjectIdentifierer -Object $Image -PropertyHint 'OS.Image'
 
-            Get-OSServer -ID $Server.id
+                    Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "create Server [$Name], Image [$Image], Flavor [$Flavor]"
+                    
+                    $BodyProperties.Add('imageRef', $Image)
+                    $Body = [PSCustomObject]@{server=$BodyProperties}
+                    Write-Output (Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers" -Property 'server' -ObjectType 'OS.CreateServer' -Body $Body)
+                }
+                'Volume'
+                {
+                    $Volume = Get-OSObjectIdentifierer -Object $Volume -PropertyHint 'OS.Volume'
+
+                    Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "create Server [$Name], Volume [$Volume], Flavor [$Flavor]"
+
+                    $VolumeProperties = [PSCustomObject]@{
+                        boot_index=0
+                        uuid=$Volume
+                        source_type='volume'
+                        destination_type='volume'
+                    }
+
+                    $BodyProperties.Add('block_device_mapping_v2', @($VolumeProperties))
+                    $Body = [PSCustomObject]@{server=$BodyProperties}
+                    Write-Output (Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers" -Property 'server' -ObjectType 'OS.CreateServer' -Body $Body)
+                }
+                default
+                {
+                    throw "unexpected ParameterSetName [$ParameterSetName]"
+                }
+            }
         }
         catch
         {

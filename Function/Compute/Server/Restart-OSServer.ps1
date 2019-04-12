@@ -3,7 +3,7 @@
 
     .DESCRIPTION
 
-    .PARAMETER ID
+    .PARAMETER ImputObject
 
     .PARAMETER Type
 
@@ -28,7 +28,8 @@ function Restart-OSServer
     (
         [Parameter (ParameterSetName = 'Default', Mandatory = $true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
-        $ID,
+        [Alias('ID', 'Identity', 'Server')]
+        $ImputObject,
 
         [Parameter (ParameterSetName = 'Default', Mandatory = $false)]
         [ValidateSet('SOFT', 'HARD')]
@@ -41,13 +42,13 @@ function Restart-OSServer
         {
             Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "start"
 
-            foreach($ID in $ID)
+            foreach($ImputObject in $ImputObject)
             {
-                $ID = Get-OSObjectIdentifierer -Object $ID -PropertyHint 'OS.Server'
+                $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Server'
 
-                Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "start Server [$ID], Type [$Type]"
+                Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "start Server [$ImputObject], Type [$Type]"
                 
-                Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers/$ID/action" -NoOutput -Body ([PSCustomObject]@{reboot=[PSCustomObject]@{type=$Type}})
+                Invoke-OSApiRequest -HTTPVerb Post -Type compute -Uri "servers/$ImputObject/action" -NoOutput -Body ([PSCustomObject]@{reboot=[PSCustomObject]@{type=$Type}})
             }
         }
         catch
