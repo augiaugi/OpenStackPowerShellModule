@@ -19,6 +19,7 @@ Download the zip file and extract it to one of your desired PowerShell module pa
 ## Authenticate
 
 *Connect to the OpenStack API and get authentication token, this is required before using any command in this module.*
+
     Connect-OSAccount -Credential (Get-Credential) -Project '<Project>' -AuthenticationUri 'http://<IP>:<Port>/v3/auth/tokens'
 
 ## Examples

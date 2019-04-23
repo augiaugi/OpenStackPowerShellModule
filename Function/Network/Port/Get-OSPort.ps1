@@ -63,10 +63,18 @@ function Get-OSPort
                 {
                     foreach($ImputObject in $ImputObject)
                     {
-                        $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Port'
+                        #inteligent pipline
+                        if($ImputObject.pstypenames[0] -eq 'OS.Server')
+                        {
+                            Get-OSPort -Server $ImputObject
+                        }
+                        else 
+                        {
+                            $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Port'
 
-                        Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get Port [$ImputObject]"
-                        Write-Output (Invoke-OSApiRequest -Type network -Uri "/v2.0/ports/$ImputObject" -Property 'port' -ObjectType 'OS.Port')
+                            Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "get Port [$ImputObject]"
+                            Write-Output (Invoke-OSApiRequest -Type network -Uri "/v2.0/ports/$ImputObject" -Property 'port' -ObjectType 'OS.Port')
+                        }
                     }
                 }
                 'Name'
