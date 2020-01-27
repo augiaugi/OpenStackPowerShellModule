@@ -64,13 +64,14 @@ function Connect-OSAccount
         Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message 'start'
  
         $headers = @{"Content-Type" = "application/json"}
-        $result = Invoke-WebRequest -Headers $headers -Method Post -Body @"
+
+        $Body = @"
         {
             "auth":{
                 "scope":{
                     "project":{
                         "domain":{
-                        "id":"default"
+                            "id":"default"
                         },
                         "name":"$Project"
                     }
@@ -91,7 +92,12 @@ function Connect-OSAccount
                 }
             }
         }
-"@ -Uri $AuthenticationUri
+"@
+
+        Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "POST - $AuthenticationUri"
+        Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "Body [$Body]"
+
+        $result = Invoke-WebRequest -Headers $headers -Method Post -Body $Body -Uri $AuthenticationUri
 
         $Global:OS_Username = $Credential.UserName
         $Global:OS_Domain = $Domain
