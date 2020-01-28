@@ -5,7 +5,7 @@
   (
     [Parameter (ParameterSetName = 'Default', Mandatory = $false)]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet('Get', 'Post', 'Put', 'Delete')]
+    [ValidateSet('Get', 'Post', 'Put', 'Patch', 'Delete')]
     [string]$HTTPVerb = 'Get',
 
     [Parameter (ParameterSetName = 'Default', Mandatory = $true)]
@@ -27,7 +27,11 @@
     [string]$Property,
 
     [Parameter (ParameterSetName = 'Default', Mandatory = $false)]
-    [switch]$NoOutput
+    [switch]$NoOutput,
+
+    [Parameter (ParameterSetName = 'Default', Mandatory = $false)]
+    [ValidateSet('application/json', 'application/openstack-images-v2.1-json-patch')]
+    [string]$ContentType = 'application/json'
   )
 
   $StartTimestamp = Get-Date
@@ -44,7 +48,7 @@
 
     $APIRequestHeader = @{
       "X-Auth-Token" = $Global:OS_AuthToken
-      "Content-Type" = 'application/json'
+      "Content-Type" = $ContentType
     }
 
     Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type DEBUG -Message "get Endpoint, Type [$Type]"
@@ -56,9 +60,9 @@
     $FullUri = "$EndpointUri/$Uri"
 
     Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type DEBUG -Message "invoke API request [$FullUri], HTTPVerb [$HTTPVerb]"
-    if($Body -and ($Body | ConvertTo-Json -Compress) -ne '{}') 
+    if($Body -and (ConvertTo-Json -InputObject $Body -Compress) -ne '{}') 
     {
-      $BodyJson = ($Body | ConvertTo-Json -Compress -Depth 99)
+      $BodyJson = (ConvertTo-Json -InputObject $Body -Depth 99)
       Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type TRACE -Message "use request body [$BodyJson]"
       $Response = @(Invoke-WebRequest -Method $HTTPVerb -Uri $FullUri -Body $BodyJson -Headers $APIRequestHeader -Verbose:$false)
     }
