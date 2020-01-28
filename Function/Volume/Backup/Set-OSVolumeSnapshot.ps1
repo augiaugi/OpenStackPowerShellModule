@@ -3,21 +3,9 @@
 
     .DESCRIPTION
 
-    .PARAMETER ImputObject
+    .PARAMETER Server
 
-    The source volume ID.
-
-    .PARAMETER Name
-
-    The backup name.
-   
-    .PARAMETER Description
-
-    The backup description.
-
-    .PARAMETER Force
-
-    Indicates whether to create a backup, even if the volume is attached.
+    .PARAMETER APIKey
 
     .INPUTS
 
@@ -27,18 +15,18 @@
 
     .LINK
 
-        https://developer.openstack.org/api-ref/block-storage/v3/#create-a-backup
+        https://docs.openstack.org/api-ref/block-storage/v3/?expanded=update-a-backup-detail#update-a-backup
 
     .NOTES
 #>
-function New-OSVolumeBackup
+function Set-OSVolumeBackup
 {
     [CmdLetBinding(DefaultParameterSetName = 'Default')]
     Param
     (
         [Parameter (ParameterSetName = 'Default', Mandatory = $true, ValueFromPipeline=$true)]
         [ValidateNotNullOrEmpty()]
-        [Alias('ID', 'Identity', 'Volume')]
+        [Alias('ID', 'Identity', 'VolumeBackup')]
         $ImputObject,
 
         [Parameter (ParameterSetName = 'Default', Mandatory = $false)]
@@ -51,11 +39,7 @@ function New-OSVolumeBackup
 
         [Parameter (ParameterSetName = 'Default', Mandatory = $false)]
         [ValidateNotNullOrEmpty()]
-        $Metadata,
-
-        [Parameter (ParameterSetName = 'Default', Mandatory = $false)]
-        [ValidateNotNullOrEmpty()]
-        [switch]$Force
+        $Metadata
     )
 
     process
@@ -66,21 +50,19 @@ function New-OSVolumeBackup
 
             foreach($ImputObject in $ImputObject)
             {
-                $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.Volume'
+                $ImputObject = Get-OSObjectIdentifierer -Object $ImputObject -PropertyHint 'OS.VolumeBackup'
 
-                Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "create VolumeBackup [$Name] from Volume [$ImputObject]"
+                Write-OSLogging -Source $MyInvocation.MyCommand.Name -Type INFO -Message "set VolumeBackup [$ImputObject]"
                     
                 $Body = [PSCustomObject]@{backup=$null}
                 $BodyProperties = @{
-                    'volume_id' = $ImputObject
                 }
                 if($Name){$BodyProperties.Add('name', $Name)}
                 if($Description){$BodyProperties.Add('description', $Description)}
                 if($Metadata){$BodyProperties.Add('metadata', $Metadata)}
-                if($Force){$BodyProperties.Add('force', $true)}
                 $Body.backup = $BodyProperties
 
-                Write-Output (Invoke-OSApiRequest -HTTPVerb Post -Type volumev3 -Uri "backups" -Property 'backup' -ObjectType 'OS.CreateVolumeBackup' -Body $Body)
+                Invoke-OSApiRequest -HTTPVerb Put -Type volumev3 -Uri "backups/$ImputObject" -Body $Body -NoOutput
             }
         }
         catch
